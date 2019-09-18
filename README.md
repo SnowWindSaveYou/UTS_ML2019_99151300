@@ -17,3 +17,14 @@ for UTS 32513 Advanced Data Analytics Algorithms
 █▐▓▓▓▓▓▓▄▄▄▓▓▓▓▓▓█▓█▓█▓█▓▓▓▐█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 ```
 
+Use matlab: `%matplotlib inline`
+
+Librarys:
+
+```
+matplotlib
+numpy
+pytorch
+sklearn
+```
+
