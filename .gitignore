@@ -19,3 +19,5 @@ dataset/np_matrix_1.txt
 np_matrix_1.txt
 *.txt
 *.csv
+*.pkl
+*.pkl
