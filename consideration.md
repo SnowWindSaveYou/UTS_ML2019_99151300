@@ -32,7 +32,7 @@ Netflix price dataset contains seven files include the ratings of users give to 
 
 # Methodology
 
-the formal recommendation system have two main ways, one is content based system that use the target of items, 
+the formal recommendation system have two main ways, one is content based system that use the   tags of items and historical preference of user to recommend the item have same tags as user browsed before.
 
 but for solve the problem of information overload the collaborative filter based systems are more approprated, they share the information between user or items to make recommendation by similar instence.
 
