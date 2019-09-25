@@ -19,22 +19,26 @@ from sklearn.metrics import roc_curve, auc
 device = torch.device("cpu")
 
 class MF(torch.nn.Module):
-    def __init__(self, num_users, num_items,latent_dim=8):
+    def __init__(self, num_users, num_items,latent_dim=8,h = 512):
         super(MF, self).__init__()
         self.num_users = num_users
         self.num_items = num_items
         self.latent_dim = latent_dim
+        self.h = h
 
         self.embedding_user = torch.nn.Embedding(num_embeddings=self.num_users, embedding_dim=self.latent_dim,sparse=True)
         self.embedding_item = torch.nn.Embedding(num_embeddings=self.num_items, embedding_dim=self.latent_dim,sparse=True)
+        self.user_fc = nn.Linear(in_features=self.latent_dim, out_features=self.h, bias=True)
+        self.item_fc = nn.Linear(in_features=self.latent_dim, out_features=self.h, bias=True)
+    
+        self.fc = nn.Linear(in_features=self.h, out_features=1, bias=True)
+    
         
     def forward(self, user_indices, item_indices):
-#         print(user_indices)
-
-        user_embedding = self.embedding_user(user_indices)
-#         print(user_embedding)
-        item_embedding = self.embedding_item(item_indices)
-        return (user_embedding*item_embedding).sum(1)
+        user_embedding = F.relu(self.user_fc(self.embedding_user(user_indices)))
+        item_embedding = F.relu(self.item_fc(self.embedding_item(item_indices)))
+        
+        return F.relu(self.fc(user_embedding * item_embedding))
 
 #--------------------------------------------------------------------------------------------------------------------
 class MLP(torch.nn.Module):
@@ -76,6 +80,7 @@ class MLP(torch.nn.Module):
 def predict(model, generator):
     model.eval()
     y_preds_all = torch.Tensor().to(device) 
+    y_labels_all = torch.Tensor().to(device) 
     y_pairs_all = torch.Tensor().type(torch.long).to(device) 
     
     for local_batch, local_labels in generator:
@@ -84,8 +89,9 @@ def predict(model, generator):
         with torch.no_grad():
             y_preds = model(local_batch[:,0], local_batch[:,1])
         y_preds_all = torch.cat((y_preds_all,y_preds))
+        y_labels_all = torch.cat((y_labels_all,local_labels))
         y_pairs_all = torch.cat((y_pairs_all,local_batch[:,0:2]))
-    return y_preds_all, y_pairs_all
+    return y_preds_all, y_labels_all ,y_pairs_all
 
 # def evaluate(model, generator):
 #     y_preds_all, y_labels_all = predict(model, generator)  
