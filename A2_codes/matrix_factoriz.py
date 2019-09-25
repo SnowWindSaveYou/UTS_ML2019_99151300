@@ -76,24 +76,26 @@ class MLP(torch.nn.Module):
 def predict(model, generator):
     model.eval()
     y_preds_all = torch.Tensor().to(device) 
-    y_labels_all = torch.Tensor().to(device) 
+    y_pairs_all = torch.Tensor().type(torch.long).to(device) 
+    
     for local_batch, local_labels in generator:
         local_batch  = torch.tensor(local_batch).type(torch.long).to(device)
         local_labels = local_labels.type(torch.float).to(device)
         with torch.no_grad():
             y_preds = model(local_batch[:,0], local_batch[:,1])
         y_preds_all = torch.cat((y_preds_all,y_preds))
-        y_labels_all = torch.cat((y_labels_all,local_labels))
-    return y_preds_all, y_labels_all
-def evaluate(model, generator):
-    y_preds_all, y_labels_all = predict(model, generator)  
-    y_preds = list(y_preds_all.view(1, y_preds_all.size()[0]).to("cpu").numpy()[0])
-    y_actuals = list(y_labels_all.view(1, y_labels_all.size()[0]).to("cpu").numpy()[0])
-    print(np.array([y_preds,y_actuals]))
-    #print(type(y_preds), type(y_actuals))
-    tmse = sum([(a-b) * (a-b) for a,b in zip(y_preds, y_actuals)])
-    rmse = math.sqrt((1.0*tmse)/len(y_preds))
-    return rmse
+        y_pairs_all = torch.cat((y_pairs_all,local_batch[:,0:2]))
+    return y_preds_all, y_pairs_all
+
+# def evaluate(model, generator):
+#     y_preds_all, y_labels_all = predict(model, generator)  
+#     y_preds = list(y_preds_all.view(1, y_preds_all.size()[0]).to("cpu").numpy()[0])
+#     y_actuals = list(y_labels_all.view(1, y_labels_all.size()[0]).to("cpu").numpy()[0])
+#     print(np.array([y_preds,y_actuals]))
+#     #print(type(y_preds), type(y_actuals))
+#     tmse = sum([(a-b) * (a-b) for a,b in zip(y_preds, y_actuals)])
+#     rmse = math.sqrt((1.0*tmse)/len(y_preds))
+#     return rmse
 
 def epoch_run(model, generator, opt, criterion,liveloss,mode="train"):
     running_loss = 0
@@ -175,6 +177,9 @@ def epoch_run_2(model_1,model_2, generator,test_, opt_1, opt_2, criterion_1,crit
             'val_mlpmf':t_loss_2.item(),
         })
         liveloss.draw()
+        i += 1
+        if i>500:
+            break
 
 #         except:
 # #             print("local_batch",local_batch)

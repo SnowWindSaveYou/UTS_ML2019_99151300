@@ -22,9 +22,13 @@ Netflix price dataset contains seven files include the ratings of users give to 
 
 
 
+Since the low activate users are useless for training model, I filtered the user have rated movies lower than 50. And for evaluate the models I will explain in next section, I decided to split the data set into three sets.
 
+- Train: include most data except the data in test set.
+- Test: randomly choose 1/10 users, and split their data by time '2005/12/1', so that dataset have include 1/10 users without data after '2005/12/1'.
+- Target: target is the full data of test data, it include full data of 1/10 users chosen by test set
 
-
+This split way allows me can evaluate the accuracy of model predict the rating of users would give to the items they were not seen before.
 
 
 
@@ -32,11 +36,9 @@ Netflix price dataset contains seven files include the ratings of users give to 
 
 # Methodology
 
-the formal recommendation system have two main ways, one is content based system that use the   tags of items and historical preference of user to recommend the item have same tags as user browsed before.
+the formal recommendation system have two main ways, one is content based system that use the   tags of items and historical preference of user to recommend the item have same tags as user browsed before, but those kind of system have the problem of over-specialization that can only find known preference while can't find potential preference, and easy to make other problem of information cocoon. (Adomavicius & Tuzhilin 2005) So, for solve the problem of information overload I think that collaborative filter based systems are more appropriated, those kind of methods make recommendation by sharing information between user or items, main idea of them are make recommendation by find other user have same preference. 
 
-but for solve the problem of information overload the collaborative filter based systems are more approprated, they share the information between user or items to make recommendation by similar instence.
-
-i choose to use the matrix fatorized models for 
+in this case, I choose to use the matrix factorization models for 
 
 ### Matrix fatorization
 
